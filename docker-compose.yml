@@ -41,6 +41,10 @@ services:
       GROUP_ID: 1
       TOPIC_CREATION_ENABLE: "true"
       LOG_LEVEL: INFO
+      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
     volumes:
       # This mount contains both the Debezium connector + the Mysql libraries (not shipped by default with Debezium)
       - ${PWD}/connectors/debezium-connector-mysql:/kafka/connect/debezium-connector-mysql
