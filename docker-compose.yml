@@ -94,3 +94,15 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
       TZ: $TZ
+
+  kowl:
+    image: quay.io/cloudhut/kowl:v1.5.0
+    restart: on-failure
+    hostname: kowl
+    volumes:
+      - ./kowl/config.yml:/etc/kowl/config.yaml
+    ports:
+      - "8080:8080"
+    entrypoint: ./kowl --config.filepath=/etc/kowl/config.yaml
+    depends_on:
+      - kafka
