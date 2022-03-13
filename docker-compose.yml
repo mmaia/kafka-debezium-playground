@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+
+  # https://registry.hub.docker.com/_/mysql/tags
+  mysql:
+    image: mysql
+    container_name: mysql
+    hostname: mysql
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: kafka-connect-studies-user
+      MYSQL_PASSWORD: connect
+      MYSQL_DATABASE: kafka_connect_studies
+      TZ: $TZ
+    volumes:
+      - ${PWD}/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+      - ${PWD}/mysql/sql:/docker-entrypoint-initdb.d/
+
+  debezium:
+    image: debezium/connect:${DEBEZIUM_VERSION}
+    container_name: kafka-connect-debezium
+    depends_on:
+      - zookeeper
+      - kafka
+      - schema-registry
+      - mysql
+    ports:
+      - 8083:8083
+    restart: unless-stopped
+    environment:
+      # Be aware the configuration for debezium/connect Docker images is slightly different from Kafka connect
+      # Confluent Docker images! Prefixed with 'CONNECT_'
+      BOOTSTRAP_SERVERS: kafka:29092
+      CONFIG_STORAGE_TOPIC: kafka-connect-debezium-configs
+      OFFSET_STORAGE_TOPIC: kafka-connect-debezium-offsets
+      STATUS_STORAGE_TOPIC: kafka-connect-debezium-status
+      GROUP_ID: 1
+      TOPIC_CREATION_ENABLE: "true"
+      LOG_LEVEL: INFO
+    volumes:
+      # This mount contains both the Debezium connector + the Mysql libraries (not shipped by default with Debezium)
+      - ${PWD}/connectors/debezium-connector-mysql:/kafka/connect/debezium-connector-mysql
+
+  # https://hub.docker.com/r/confluentinc/cp-zookeeper/tags
+  zookeeper:
+    image: confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      TZ: $TZ
+
+  # https://hub.docker.com/r/confluentinc/cp-kafka/tags
+  kafka:
+    image: confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION}
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_NUM_PARTITIONS: 1
+      TZ: $TZ
+    depends_on:
+      - zookeeper
+
+  # https://registry.hub.docker.com/r/confluentinc/cp-schema-registry/tags
+  schema-registry:
+    image: confluentinc/cp-schema-registry:${CONFLUENT_PLATFORM_VERSION}
+    container_name: schema-registry
+    ports:
+      - 8081:8081
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
+      TZ: $TZ

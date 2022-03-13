@@ -1,0 +1,32 @@
+POST http://localhost:8083/connectors
+Content-Type: application/json
+
+< ./connectors/config/mysql-connect.json
+
+###
+GET http://localhost:8083/
+
+###
+GET http://localhost:8083/connectors/
+
+###
+GET http://localhost:8083/connectors?expand=status
+
+###
+GET http://localhost:8083/connectors?expand=info
+
+###
+GET http://localhost:8083/connectors/user-pets-connector
+
+###
+DELETE http://localhost:8083/connectors/user-pets-connector
+
+###
+GET http://localhost:8083/connectors/user-pets-connector/config
+
+###
+GET http://localhost:8083/connectors/user-pets-connector/status
+
+
+### Check schema registry
+GET http://localhost:8081/subjects

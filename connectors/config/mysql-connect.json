@@ -1,0 +1,20 @@
+{
+  "name": "user-pets-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+    "database.hostname": "mysql",
+    "database.port": "3306",
+    "database.user": "kafka-connect-studies-user",
+    "database.password": "connect",
+    "database.server.id": "184054",
+    "database.server.name": "kafka_connect_studies",
+    "database.include.list": "kafka_connect_studies",
+    "database.history.kafka.bootstrap.servers": "kafka:29092",
+    "database.history.kafka.topic": "dbhistory.pets",
+    "include.schema.changes": "true",
+    "topic.creation.enable": "true",
+    "topic.creation.default.replication.factor": 1,
+    "topic.creation.default.partitions": 1
+
+  }
+}
