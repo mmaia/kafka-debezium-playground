@@ -3,8 +3,23 @@
   "type": "record",
   "name": "UserPet",
   "fields": [
-    { "name": "symbol", "type": "string"},
-    { "name": "tradeValue", "type": "double"},
-    { "name": "tradeTime", "type": ["null", "long"], "default": null}
+    { "name": "firstName", "type": "string"},
+    { "name": "lastName", "type": "string"},
+    { "name": "timestamp", "type": ["null", "long"], "default": null},
+    { "name":  "title", "type": ["null", "string"], "default": null},
+    { "name": "version", "type": ["null", "int"], "default": null},
+    { "name":  "pets",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "Pet",
+          "fields": [
+            { "name": "name", "type": "string"},
+            { "name": "breed", "type": "string"}
+          ]
+        }
+      }
+    }
   ]
 }

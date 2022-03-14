@@ -1,1 +1,13 @@
+spring:
+  application:
+    name: "kafka-debezium-playground"
+  kafka:
+    bootsrap-servers:
+      - localhost:9092
 
+
+kafka:
+  bootstrap-servers:
+    - localhost:9092
+  schema-registry-url: "http://localhost:8081"
+  state-dir: "/tmp/user-pet-store"
