@@ -1,0 +1,10 @@
+{
+  "namespace": "com.maia.debezium.playground",
+  "type": "record",
+  "name": "UserPet",
+  "fields": [
+    { "name": "symbol", "type": "string"},
+    { "name": "tradeValue", "type": "double"},
+    { "name": "tradeTime", "type": ["null", "long"], "default": null}
+  ]
+}
