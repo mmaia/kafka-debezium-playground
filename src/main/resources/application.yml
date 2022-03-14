@@ -5,6 +5,8 @@ spring:
     bootsrap-servers:
       - localhost:9092
 
+server:
+  port: 7777
 
 kafka:
   bootstrap-servers:
