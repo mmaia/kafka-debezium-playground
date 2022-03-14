@@ -29,7 +29,7 @@ services:
       - schema-registry
       - mysql
     ports:
-      - 8083:8083
+      - "8083:8083"
     restart: unless-stopped
     environment:
       # Be aware the configuration for debezium/connect Docker images is slightly different from Kafka connect
