@@ -38,7 +38,7 @@ class KafkaConfig(val kafkaProps: KafkaProps) {
             LogAndContinueExceptionHandler::class.java
         props[AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG] = kafkaProps.schemaRegistryUrl
         props[StreamsConfig.APPLICATION_ID_CONFIG] = "user-pets-stream"
-        props[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String().javaClass.name
+        props[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = SpecificAvroSerde::class.java
         props[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = SpecificAvroSerde::class.java
         props[ConsumerConfig.GROUP_ID_CONFIG] = "user-pets-stream-group"
         return KafkaStreamsConfiguration(props)

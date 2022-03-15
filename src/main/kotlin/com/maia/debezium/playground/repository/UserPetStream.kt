@@ -8,7 +8,6 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import kafka_connect_studies.kafka_connect_studies.users.Envelope
 import kafka_connect_studies.kafka_connect_studies.users.Key
-import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StoreQueryParameters
@@ -28,6 +27,7 @@ import org.springframework.kafka.config.StreamsBuilderFactoryBean
 class UserPetStream (kafkaProps: KafkaProps) {
 
     private val usersValueSerde = SpecificAvroSerde<Envelope>()
+    private val usersKeySerde = SpecificAvroSerde<Key>()
     private lateinit var userView: ReadOnlyKeyValueStore<Key, Envelope>
 
     private val userPetSerde = SpecificAvroSerde<UserPet>()
@@ -39,6 +39,7 @@ class UserPetStream (kafkaProps: KafkaProps) {
     @PostConstruct
     fun init() {
         userPetSerde.configure(serdeConfig, false)
+        usersKeySerde.configure(serdeConfig, true)
     }
 
     @Bean
@@ -59,10 +60,10 @@ class UserPetStream (kafkaProps: KafkaProps) {
     }
 
     @Bean
-    fun userByIdGKTable(streamsBuilder: StreamsBuilder): GlobalKTable<Long, Envelope> {
+    fun userByIdGKTable(streamsBuilder: StreamsBuilder): GlobalKTable<Key, Envelope> {
         return streamsBuilder.globalTable(USER_PETS_TOPIC,
-         Materialized.`as`<Long, Envelope, KeyValueStore<Bytes, ByteArray>>(USERS_TABLE)
-            .withKeySerde(Serdes.Long())
+         Materialized.`as`<Key, Envelope, KeyValueStore<Bytes, ByteArray>>(USERS_TABLE)
+            .withKeySerde(usersKeySerde)
                 .withValueSerde(usersValueSerde))
     }
 
