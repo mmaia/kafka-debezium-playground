@@ -1,9 +1,9 @@
 package com.maia.debezium.playground.repository
 
 import com.maia.debezium.playground.UserPet
+import com.maia.debezium.playground.config.DEB_USERS_TOPIC
 import com.maia.debezium.playground.config.KafkaProps
 import com.maia.debezium.playground.config.USERS_TABLE
-import com.maia.debezium.playground.config.USER_PETS_TOPIC
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import kafka_connect_studies.kafka_connect_studies.users.Envelope
@@ -13,15 +13,15 @@ import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StoreQueryParameters
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.kstream.GlobalKTable
-import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
-import org.springframework.context.annotation.Bean
-import org.springframework.stereotype.Repository
-import java.util.*
-import javax.annotation.PostConstruct
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.QueryableStoreTypes
+import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
+import org.springframework.context.annotation.Bean
 import org.springframework.kafka.config.StreamsBuilderFactoryBean
+import org.springframework.stereotype.Repository
+import java.util.*
+import javax.annotation.PostConstruct
 
 @Repository
 class UserPetStream (kafkaProps: KafkaProps) {
@@ -61,7 +61,8 @@ class UserPetStream (kafkaProps: KafkaProps) {
 
     @Bean
     fun userByIdGKTable(streamsBuilder: StreamsBuilder): GlobalKTable<Key, Envelope> {
-        return streamsBuilder.globalTable(USER_PETS_TOPIC,
+        return streamsBuilder.globalTable(
+            DEB_USERS_TOPIC,
          Materialized.`as`<Key, Envelope, KeyValueStore<Bytes, ByteArray>>(USERS_TABLE)
             .withKeySerde(usersKeySerde)
                 .withValueSerde(usersValueSerde))

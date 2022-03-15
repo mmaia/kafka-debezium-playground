@@ -54,5 +54,6 @@ class KafkaConfig(val kafkaProps: KafkaProps) {
     }
 }
 
+const val DEB_USERS_TOPIC = "kafka_connect_studies.kafka_connect_studies.users"
 const val USER_PETS_TOPIC = "user-pets-topic"
 const val USERS_TABLE = "users-table"
