@@ -2,11 +2,11 @@ package com.maia.debezium.playground.config
 
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.errors.LogAndContinueExceptionHandler
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.serialization.Serdes
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.annotation.EnableKafka
@@ -17,8 +17,6 @@ import org.springframework.kafka.config.StreamsBuilderFactoryBean
 import org.springframework.kafka.config.StreamsBuilderFactoryBeanConfigurer
 import org.springframework.kafka.config.TopicBuilder
 import org.springframework.kafka.core.KafkaAdmin.NewTopics
-import java.util.*
-import kotlin.collections.HashMap
 
 @Configuration
 @EnableKafka

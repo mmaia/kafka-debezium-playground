@@ -37,6 +37,9 @@ GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.p
 GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.pets-value/versions/latest
 
 ###
+GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.users-key/versions/latest
+
+###
 GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.users-value/versions/latest
 
 ###
@@ -44,4 +47,7 @@ GET http://localhost:8081/schemas/ids/1
 
 ###
 GET http://localhost:8081/schemas/types
+
+###
+GET http://localhost:7777/api/user/1
 

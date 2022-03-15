@@ -7,6 +7,7 @@ import com.maia.debezium.playground.config.USER_PETS_TOPIC
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import kafka_connect_studies.kafka_connect_studies.users.Envelope
+import kafka_connect_studies.kafka_connect_studies.users.Key
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KafkaStreams
@@ -27,7 +28,7 @@ import org.springframework.kafka.config.StreamsBuilderFactoryBean
 class UserPetStream (kafkaProps: KafkaProps) {
 
     private val usersValueSerde = SpecificAvroSerde<Envelope>()
-    private lateinit var userView: ReadOnlyKeyValueStore<Long, Envelope>
+    private lateinit var userView: ReadOnlyKeyValueStore<Key, Envelope>
 
     private val userPetSerde = SpecificAvroSerde<UserPet>()
 
@@ -44,7 +45,7 @@ class UserPetStream (kafkaProps: KafkaProps) {
     fun afterStartUsers(sbfb: StreamsBuilderFactoryBean): StreamsBuilderFactoryBean.Listener {
         val listener: StreamsBuilderFactoryBean.Listener = object : StreamsBuilderFactoryBean.Listener {
             override fun streamsAdded(id: String, streams: KafkaStreams) {
-                userView = streams.store<ReadOnlyKeyValueStore<Long, Envelope>>(
+                userView = streams.store<ReadOnlyKeyValueStore<Key, Envelope>>(
                     StoreQueryParameters.fromNameAndType(
                         USERS_TABLE,
                         QueryableStoreTypes.keyValueStore()
@@ -65,4 +66,8 @@ class UserPetStream (kafkaProps: KafkaProps) {
                 .withValueSerde(usersValueSerde))
     }
 
+    fun getUserById(id: Long): Envelope? {
+        val userId = Key.newBuilder().setId(id).build()
+        return userView.get(userId)
+    }
 }
