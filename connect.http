@@ -27,7 +27,6 @@ GET http://localhost:8083/connectors/user-pets-connector/config
 ###
 GET http://localhost:8083/connectors/user-pets-connector/status
 
-
 ###  schema registry
 GET http://localhost:8081/subjects
 

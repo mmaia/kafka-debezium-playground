@@ -22,7 +22,7 @@
 		<avro.version>1.11.0</avro.version>
 		<confluent.version>7.0.1</confluent.version>
 		<spring-kafka.version>2.8.3</spring-kafka.version>
-		<kafka.version>3.0.0</kafka.version>
+		<kafka.version>3.1.0</kafka.version>
 	</properties>
 
 	<dependencies>

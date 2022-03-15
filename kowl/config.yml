@@ -9,8 +9,8 @@ kafka:
 connect:
   enabled: true
   clusters:
-    - name: connect
-      url: http://connect:8083
+    - name: debezium
+      url: http://debezium:8083
 
   # server:
   # listenPort: 8080

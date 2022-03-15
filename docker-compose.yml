@@ -22,7 +22,8 @@ services:
 
   debezium:
     image: debezium/connect:${DEBEZIUM_VERSION}
-    container_name: kafka-connect-debezium
+    container_name: debezium
+    hostname: debezium
     depends_on:
       - zookeeper
       - kafka
