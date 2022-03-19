@@ -20,7 +20,6 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
 import org.springframework.context.annotation.Bean
 import org.springframework.kafka.config.StreamsBuilderFactoryBean
 import org.springframework.stereotype.Repository
-import java.util.*
 import javax.annotation.PostConstruct
 
 @Repository
@@ -28,18 +27,20 @@ class UserPetStream (kafkaProps: KafkaProps) {
 
     private val usersValueSerde = SpecificAvroSerde<Envelope>()
     private val usersKeySerde = SpecificAvroSerde<Key>()
+
     private lateinit var userView: ReadOnlyKeyValueStore<Key, Envelope>
 
     private val userPetSerde = SpecificAvroSerde<UserPet>()
 
-    val serdeConfig: MutableMap<String, String> = Collections.singletonMap(
-        AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafkaProps.schemaRegistryUrl
+    val serdeConfig: MutableMap<String, String> = hashMapOf(
+        AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to kafkaProps.schemaRegistryUrl
     )
 
     @PostConstruct
     fun init() {
         userPetSerde.configure(serdeConfig, false)
         usersKeySerde.configure(serdeConfig, true)
+        usersValueSerde.configure(serdeConfig, false)
     }
 
     @Bean
@@ -62,8 +63,7 @@ class UserPetStream (kafkaProps: KafkaProps) {
     @Bean
     fun userByIdGKTable(streamsBuilder: StreamsBuilder): GlobalKTable<Key, Envelope> {
         return streamsBuilder.globalTable(
-            DEB_USERS_TOPIC,
-         Materialized.`as`<Key, Envelope, KeyValueStore<Bytes, ByteArray>>(USERS_TABLE)
+            DEB_USERS_TOPIC, Materialized.`as`<Key, Envelope, KeyValueStore<Bytes, ByteArray>>(USERS_TABLE)
             .withKeySerde(usersKeySerde)
                 .withValueSerde(usersValueSerde))
     }
