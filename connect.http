@@ -30,8 +30,14 @@ GET http://localhost:8083/connectors/user-pets-connector/status
 ###  schema registry
 GET http://localhost:8081/subjects
 
+### check versions
+GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.users-value/versions
+
 ###
 GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.pets-value/versions
+
+###
+GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.pets-key/versions/latest
 
 ###
 GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.pets-value/versions/latest

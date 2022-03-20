@@ -13,9 +13,8 @@ class UserApi(private val userPetStream: UserPetStream) {
 
     @GetMapping("/{id}")
     fun getUser(@PathVariable id: Long) {
-        val envelope = userPetStream.getUserById(id)
-        var user = envelope?.after
-        val uDto = UserDto(user!!.id, user!!.firstName.toString(), user.lastName.toString(), user.title.toString(),  user.version)
+        val user = userPetStream.getUserById(id)
+        val uDto = UserDto(user.id, user.firstName.toString(), user.lastName.toString(), user.title.toString(),  user.version)
         println(uDto)
     }
 

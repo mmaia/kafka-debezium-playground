@@ -122,11 +122,15 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+
 			<!-- avro -->
 			<plugin>
 				<groupId>org.apache.avro</groupId>
 				<artifactId>avro-maven-plugin</artifactId>
 				<version>${avro.version}</version>
+				<configuration>
+					<stringType>String</stringType>
+				</configuration>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
