@@ -22,7 +22,9 @@ class KafkaConfig(val kafkaProps: KafkaProps) {
     fun appTopics(): NewTopics {
         return NewTopics(
             TopicBuilder.name(USERS_TOPIC).compact().build(),
-            TopicBuilder.name(USER_PETS_TOPIC).compact().build()
+            TopicBuilder.name(USER_PETS_TOPIC).compact().build(),
+            TopicBuilder.name(PETS_TOPIC).build(),
+            TopicBuilder.name(USER_PETS_AGGR_TOPIC).compact().build()
         )
     }
 
@@ -30,20 +32,20 @@ class KafkaConfig(val kafkaProps: KafkaProps) {
     @Bean(name = [DEFAULT_STREAM_BEAN])
     fun streamsBuilderFactoryBean(): StreamsBuilderFactoryBean {
         val props = defaultStreamsConfig()
-        props.putAll(longKeyStreamBeanConfig())
+        props.putAll(defaultStreamBeanConfig())
         val factory = StreamsBuilderFactoryBean()
         factory.setStreamsConfiguration(props)
         return factory
     }
 
-//    @Bean(name = [DEB_STREAM_BEAN])
-//    fun debStreamBean(): StreamsBuilderFactoryBean {
-//        val props = defaultStreamsConfig()
-//        props.putAll(debeziumStreamBeanConfig())
-//        val factory = StreamsBuilderFactoryBean()
-//        factory.setStreamsConfiguration(props)
-//        return factory
-//    }
+    @Bean(name = [DEB_STREAM_BEAN])
+    fun debStreamBean(): StreamsBuilderFactoryBean {
+        val props = defaultStreamsConfig()
+        props.putAll(debeziumStreamBeanConfig())
+        val factory = StreamsBuilderFactoryBean()
+        factory.setStreamsConfiguration(props)
+        return factory
+    }
 
     fun defaultStreamsConfig(): Properties {
         val props = Properties()
@@ -55,21 +57,17 @@ class KafkaConfig(val kafkaProps: KafkaProps) {
         return props
     }
 
-
-//    fun debeziumStreamBeanConfig(): MutableMap<String, Any> {
-//        val props: MutableMap<String, Any> = HashMap()
-////        props[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = SpecificAvroSerde::class.java
-//        props[StreamsConfig.APPLICATION_ID_CONFIG] = "debezium-user-pets-stream"
-//       return props
-//    }
-
-    fun longKeyStreamBeanConfig(): Properties {
-        val props = Properties()
-//        props[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Long::class.java
-        props[StreamsConfig.APPLICATION_ID_CONFIG] = "long-key-user-pets-stream"
-        return props
+    fun debeziumStreamBeanConfig(): MutableMap<String, Any> {
+        val props: MutableMap<String, Any> = HashMap()
+        props[StreamsConfig.APPLICATION_ID_CONFIG] = "debezium-user-pets-stream"
+       return props
     }
 
+    fun defaultStreamBeanConfig(): Properties {
+        val props = Properties()
+        props[StreamsConfig.APPLICATION_ID_CONFIG] = "default-user-pets-stream"
+        return props
+    }
 
     @Bean
     fun configurer(): StreamsBuilderFactoryBeanConfigurer? {
@@ -81,12 +79,16 @@ class KafkaConfig(val kafkaProps: KafkaProps) {
     }
 }
 
-//const val DEB_STREAM_BEAN = "debStream"
+const val DEB_STREAM_BEAN = "debStream"
 const val DEFAULT_STREAM_BEAN = "defaultStream"
 
 const val DEB_USERS_TOPIC = "kafka_connect_studies.kafka_connect_studies.users"
 const val DEB_PETS_TOPIC = "kafka_connect_studies.kafka_connect_studies.pets"
 
+const val PETS_TOPIC = "pets-topic"
 const val USERS_TOPIC = "users-topic"
 const val USER_PETS_TOPIC = "user-pets-topic"
+const val USER_PETS_AGGR_TOPIC = "user-pets-aggr-topic"
+
 const val USERS_TABLE = "users-table"
+const val USER_PETS_AGGR_TABLE = "user-pets-aggr-table"

@@ -5,15 +5,18 @@
   "fields": [
     {
       "name": "id",
-      "type": "long"
+      "type": ["null","long"],
+      "default": null
     },
     {
       "name": "firstName",
-      "type": "string"
+      "type": ["null", "string"],
+      "default": null
     },
     {
       "name": "lastName",
-      "type": "string"
+      "type": ["null" ,"string"],
+      "default": null
     },
     {
       "name": "timestamp",
