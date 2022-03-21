@@ -76,14 +76,14 @@ class UserPetStreamDebezium(val kafkaProps: KafkaProps) {
     }
 
     @Bean
-    fun userDebStream(@Qualifier(DEB_STREAM_BEAN) streamsBuilder: StreamsBuilder): KStream<kafka_connect_studies.kafka_connect_studies.users.Key, kafka_connect_studies.kafka_connect_studies.users.Envelope> {
+    fun userStreamDebToUser(@Qualifier(DEB_STREAM_BEAN) streamsBuilder: StreamsBuilder): KStream<kafka_connect_studies.kafka_connect_studies.users.Key, kafka_connect_studies.kafka_connect_studies.users.Envelope> {
         val userDebStream = streamsBuilder.stream(DEB_USERS_TOPIC, Consumed.with(usersKeySerde, usersValueSerde))
         userDebStream.map(userMapper::apply).to(USERS_TOPIC, Produced.with(Serdes.Long(), userSerde))
         return userDebStream
     }
 
     @Bean
-    fun petsStream(
+    fun petsStreamDebToPets(
         @Qualifier(DEB_STREAM_BEAN) streamsBuilder: StreamsBuilder): KStream<Long, Pet>? {
         val stream: KStream<Key, Envelope> =
             streamsBuilder.stream(DEB_PETS_TOPIC, Consumed.with(petsKeySerde, petsValueSerde))

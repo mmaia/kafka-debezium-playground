@@ -90,6 +90,28 @@ class UserPetStream(val kafkaProps: KafkaProps) {
         return userPetsKTable
     }
 
+    @Bean
+    fun userPetsStreamProcess(
+        @Qualifier(DEFAULT_STREAM_BEAN) streamsBuilder: StreamsBuilder,
+        user: GlobalKTable<Long, User>
+    ): KStream<Long, UserPet> {
+        val userPetStream: KStream<Long, UserPet> =
+            streamsBuilder.stream(USER_PETS_AGGR_TOPIC, Consumed.with(Serdes.Long(), userPetSerde))
+                .leftJoin(user,
+                    { userId, _ -> userId },
+                    { userPets, userEntry ->
+                        userPets.firstName = userEntry.firstName
+                        userPets.lastName = userEntry.lastName
+                        userPets.title = userEntry.title
+                        userPets.version = userEntry.version
+                        userPets.timestamp = userEntry.timestamp
+                        userPets
+                    }
+                )
+        userPetStream.to(USER_PETS_TOPIC, Produced.with(Serdes.Long(), userPetSerde))
+        return userPetStream
+    }
+
     fun getUserById(id: Long): User {
         return userView.get(id)
     }
