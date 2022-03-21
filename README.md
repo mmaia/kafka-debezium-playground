@@ -24,4 +24,10 @@ approach to processing debeizum generated messages from source connectors.
 - `join-with-deb-envelop`: This branch demonstrate processing the Debezium messages relying in the default debezium message
 format for value(Envelop) and key(Key) and using the `join` between a GlobalKTable(Users) and a KStream(Pets).
 
-- 
+
+### Avro console consumer
+
+Kowl doesn't process primitive type keys properly(Assumes Avro type) so if want to check topics with primitive types as key use: 
+
+
+`kafka-avro-console-consumer --bootstrap-server kafka:29092 --topic users-topic --from-beginning --key-deserializer=org.apache.kafka.common.serialization.LongDeserializer --property print.key=true`

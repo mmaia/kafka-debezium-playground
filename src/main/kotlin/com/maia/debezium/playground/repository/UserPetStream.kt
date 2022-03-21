@@ -132,7 +132,10 @@ class UserPetStream(kafkaProps: KafkaProps) {
     }
 
     @Bean
-    fun petsStream(@Qualifier(DEFAULT_STREAM_BEAN) streamsBuilder: StreamsBuilder, userByIdGKTable: GlobalKTable<Long, User>): KStream<Long, UserPet>? {
+    fun petsStream(
+        @Qualifier(DEFAULT_STREAM_BEAN) streamsBuilder: StreamsBuilder,
+        userByIdGKTable: GlobalKTable<Long, User>
+    ): KStream<Long, UserPet>? {
 
         val stream: KStream<Key, Envelope> =
             streamsBuilder.stream(DEB_PETS_TOPIC, Consumed.with(petsKeySerde, petsValueSerde))
@@ -141,14 +144,22 @@ class UserPetStream(kafkaProps: KafkaProps) {
             stream
                 .map(petMapper::apply)
                 .leftJoin(userByIdGKTable,
-                { _, pet -> pet.userId },
-                { pet, user ->
-                    UserPet(user?.firstName, user?.lastName, user?.timestamp, user?.title, user?.version, null)
+                    { _, pet -> pet.userId },
+                    fun(pet, user): UserPet {
+                        val uPet =
+                            UserPet(user?.firstName, user?.lastName, user?.timestamp, user?.title, user?.version, null)
+                        if(pet != null) {
+                            val pet = Pet(pet?.id, pet?.name, pet?.breed, pet?.userId)
+                            uPet.pets = ArrayList<Pet>()
+                            uPet.pets.add(pet)
+                        }
+                        return uPet
+                    }
+                )
 
-                }
-            )
+        resStream.to(USER_PETS_TOPIC, Produced.with(Serdes.Long(), userPetSerde))
 
-        return null
+        return resStream
     }
 
 }
