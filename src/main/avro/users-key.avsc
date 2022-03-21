@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "Key",
+  "namespace": "kafka_connect_studies.kafka_connect_studies.users",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    }
+  ],
+  "connect.name": "kafka_connect_studies.kafka_connect_studies.users.Key"
+}

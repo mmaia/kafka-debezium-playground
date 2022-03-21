@@ -22,7 +22,8 @@ services:
 
   debezium:
     image: debezium/connect:${DEBEZIUM_VERSION}
-    container_name: kafka-connect-debezium
+    container_name: debezium
+    hostname: debezium
     depends_on:
       - zookeeper
       - kafka
@@ -96,7 +97,7 @@ services:
       TZ: $TZ
 
   kowl:
-    image: quay.io/cloudhut/kowl:v1.5.0
+    image: quay.io/cloudhut/kowl:v1.4.0
     restart: on-failure
     hostname: kowl
     volumes:
