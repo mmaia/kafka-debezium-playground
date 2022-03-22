@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "PriceHistory",
+  "namespace": "com.maia.debezium.playground.avro",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "productId",
+      "type": ["null", "long"],
+      "default": null
+    },
+    {
+      "name": "price",
+      "type": ["null", "double"],
+      "default": null
+    },
+    {
+      "name": "timestamp",
+      "type": ["null", "long"],
+      "default": null
+    }
+  ]
+}

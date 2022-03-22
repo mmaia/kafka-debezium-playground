@@ -76,7 +76,7 @@ class UserPetStream(val kafkaProps: KafkaProps) {
         val userPetsKTable = petsTopicStream
             .groupByKey()
             .aggregate(
-                UserPet.newBuilder()::build,
+                UserPet::new,
                 { userId, pet, userPet: UserPet ->
                     userPet.id = userId
                     userPet.pets?.add(pet)

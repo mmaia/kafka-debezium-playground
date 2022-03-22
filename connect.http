@@ -30,7 +30,7 @@ GET http://localhost:8083/connectors/user-pets-connector/status
 ###  schema registry
 GET http://localhost:8081/subjects
 
-### check versions
+### check versions user pets
 GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.users-value/versions
 
 ###
@@ -57,3 +57,11 @@ GET http://localhost:8081/schemas/types
 ###
 GET http://localhost:7777/api/user/1
 
+### check versions price history
+GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.price_history-value/versions
+
+###
+GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.price_history-key/versions/latest
+
+###
+GET http://localhost:8081/subjects/kafka_connect_studies.kafka_connect_studies.price_history-value/versions/latest
