@@ -1,6 +1,7 @@
 package com.maia.debezium.playground.repository
 
 import com.maia.debezium.playground.avro.PriceHistory
+import com.maia.debezium.playground.avro.PricePoint
 import com.maia.debezium.playground.config.DEB_PRICE_HISTORY_TOPIC
 import com.maia.debezium.playground.config.KafkaProps
 import com.maia.debezium.playground.config.PRICE_HISTORY_STREAM_BEAN
@@ -33,17 +34,16 @@ class PriceHistoryStreamDebezium(private val kafkaProps: KafkaProps) {
         AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to this.kafkaProps.schemaRegistryUrl
     )
 
-//    val priceHistoryMapper: BiFunction<kafka_connect_studies.kafka_connect_studies.price_history.Key, kafka_connect_studies.kafka_connect_studies.price_history.Envelope, KeyValue<String, PriceHistory>> =
-//        BiFunction<kafka_connect_studies.kafka_connect_studies.price_history.Key, kafka_connect_studies.kafka_connect_studies.price_history.Envelope, KeyValue<String, PriceHistory>> {
-//            key, envelope ->
-//            val priceHistory = PriceHistory(
-//                key.id,
-//                envelope.after.asset,
-//                envelope.after.price,
-//                isoDateToEpochMilli(envelope.after.dateTime)
-//            )
-//            KeyValue<String, PriceHistory>(priceHistory.asset, priceHistory)
-//        }
+    val priceHistoryMapper: BiFunction<kafka_connect_studies.kafka_connect_studies.price_history.Key, kafka_connect_studies.kafka_connect_studies.price_history.Envelope, KeyValue<String, PriceHistory>> =
+        BiFunction<kafka_connect_studies.kafka_connect_studies.price_history.Key, kafka_connect_studies.kafka_connect_studies.price_history.Envelope, KeyValue<String, PriceHistory>> {
+            _, envelope ->
+            val priceHistory = PriceHistory(
+                envelope.after.asset,
+                isoDateToEpochMilli(envelope.after.dateTime),
+                listOf(PricePoint(envelope.after.price))
+            )
+            KeyValue<String, PriceHistory>(priceHistory.asset, priceHistory)
+        }
 
     @PostConstruct
     fun init() {
@@ -57,42 +57,24 @@ class PriceHistoryStreamDebezium(private val kafkaProps: KafkaProps) {
         val debStream: KStream<Key, Envelope> =
             streamsBuilder.stream(DEB_PRICE_HISTORY_TOPIC, Consumed.with(phKeySerde, phValueSerde))
 
-        val to = debStream.groupByKey()
-            .windowedBy(SlidingWindows.ofTimeDifferenceWithNoGrace(Duration.ofHours(1)))
+        val phStream: KStream<String, PriceHistory> =
+            debStream.map(priceHistoryMapper::apply)
+
+        phStream.groupByKey()
+            .windowedBy(SlidingWindows.ofTimeDifferenceAndGrace(Duration.ofHours(1), Duration.ofMinutes(1)))
             .aggregate(
                 PriceHistory.newBuilder()::build,
-                { assetKey: Key, ph: Envelope, priceHistory: PriceHistory ->
+                {  assetKey, ph, priceHistory: PriceHistory ->
+                    priceHistory.asset = assetKey
+                    priceHistory.timestamp = ph.timestamp
+                    priceHistory.prices.addAll(ph.prices)
                     priceHistory
                 },
-                Materialized.with(Serdes.String(), phSerde)
-            ).toStream()
+                Materialized.with(Serdes.String(), phSerde)).toStream()
             .map { key: Windowed<String>, ph: PriceHistory ->
                 KeyValue<String, PriceHistory>(key.key(), ph)
             }
             .to(PRICE_HIST_AGGR_TOPIC, Produced.with(Serdes.String(), phSerde))
-
-//        val phStream: KStream<String, PriceHistory> =
-//            debStream.map(priceHistoryMapper::apply)
-
-//        phStream.groupByKey()
-//            .windowedBy(SlidingWindows.ofTimeDifferenceAndGrace(Duration.ofHours(1),
-//                Duration.ofMinutes(10)))
-//            .aggregate(
-//                PriceHistory.newBuilder()::build,
-//                {  assetKey, ph, priceHistory: PriceHistory ->
-//                    priceHistory.asset = assetKey
-//                    priceHistory.id = ph.id
-//                    priceHistory.price = ph.price
-//                    priceHistory
-//                },
-//                Materialized.with(Serdes.String(), phSerde)).toStream()
-//            .map { key: Windowed<String>, ph: PriceHistory ->
-//                KeyValue<String, PriceHistory>(key.key(), ph)
-//            }
-//            .to(PRICE_HIST_AGGR_TOPIC, Produced.with(Serdes.String(), phSerde))
-
-        return null
+        return phStream
     }
-
-
 }

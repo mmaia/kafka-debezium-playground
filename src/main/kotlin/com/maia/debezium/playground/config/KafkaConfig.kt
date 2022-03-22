@@ -86,6 +86,7 @@ class KafkaConfig(val kafkaProps: KafkaProps) {
         props[StreamsConfig.APPLICATION_ID_CONFIG] = "price-history-stream"
         props[StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG] = PriceHistoryTimestampExtractor::class.java.name
         props[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String().javaClass.name
+        props[StreamsConfig.PROCESSING_GUARANTEE_CONFIG] = StreamsConfig.EXACTLY_ONCE_V2
         return props
     }
 
