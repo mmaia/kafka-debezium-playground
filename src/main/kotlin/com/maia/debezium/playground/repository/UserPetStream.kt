@@ -23,7 +23,7 @@ import javax.annotation.PostConstruct
 
 
 @Repository
-class UserPetStream(val kafkaProps: KafkaProps) {
+class UserPetStream(private val kafkaProps: KafkaProps) {
     private val userSerde = SpecificAvroSerde<User>()
     private val petSerde = SpecificAvroSerde<Pet>()
 
@@ -76,7 +76,7 @@ class UserPetStream(val kafkaProps: KafkaProps) {
         val userPetsKTable = petsTopicStream
             .groupByKey()
             .aggregate(
-                UserPet::new,
+                UserPet.newBuilder()::build,
                 { userId, pet, userPet: UserPet ->
                     userPet.id = userId
                     userPet.pets?.add(pet)

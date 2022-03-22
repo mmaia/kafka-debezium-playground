@@ -4,23 +4,32 @@
   "namespace": "com.maia.debezium.playground.avro",
   "fields": [
     {
-      "name": "id",
-      "type": "long"
-    },
-    {
-      "name": "productId",
-      "type": ["null", "long"],
-      "default": null
-    },
-    {
-      "name": "price",
-      "type": ["null", "double"],
+      "name": "asset",
+      "type": ["null", "string"],
       "default": null
     },
     {
       "name": "timestamp",
       "type": ["null", "long"],
       "default": null
+    },
+    {
+      "name": "prices",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "PricePoint",
+          "fields": [
+            {
+              "name": "price",
+              "type": ["null", "double"],
+              "default": null
+            }
+          ]
+        }
+      },
+      "default": []
     }
   ]
 }

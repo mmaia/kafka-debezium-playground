@@ -3,6 +3,7 @@ package com.maia.debezium.playground.repository
 import com.maia.debezium.playground.Pet
 import com.maia.debezium.playground.User
 import com.maia.debezium.playground.config.*
+import com.maia.debezium.playground.isoDateToEpochMilli
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import kafka_connect_studies.kafka_connect_studies.pets.Envelope
@@ -16,8 +17,6 @@ import org.apache.kafka.streams.kstream.Produced
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Repository
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.function.BiFunction
 import javax.annotation.PostConstruct
 
@@ -44,7 +43,7 @@ class UserPetStreamDebezium(val kafkaProps: KafkaProps) {
                 key.id,
                 envelope.after.firstName,
                 envelope.after.lastName,
-                parseDate(envelope.after.timestamp),
+                isoDateToEpochMilli(envelope.after.timestamp),
                 envelope.after.title,
                 envelope.after.version
             )
@@ -96,15 +95,4 @@ class UserPetStreamDebezium(val kafkaProps: KafkaProps) {
 
         return resStream
     }
-
-    fun parseDate(isoDate: String): Long? {
-        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        val date: Date? = try {
-            format.parse(isoDate)
-        } catch (e: Exception) {
-            null
-        }
-        return date?.toInstant()?.toEpochMilli()
-    }
-
 }
